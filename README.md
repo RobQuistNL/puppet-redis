@@ -1,122 +1,31 @@
-# Puppet module: redis
+# Puppet module: redis multi
 
-This is a Puppet redis module from the second generation of Example42 Puppet Modules.
+This is a Puppet module for redis.
+It manages its installation, configuration and service. It allows to run several instances
+independently of one another.
 
-Made by Alessandro Franceschi / Lab42
+The blueprint of this module is from http://github.com/Enrise/puppet-memcached
 
-Official site: http://www.example42.com
+Released under the terms of 2-clause BSD license (see the License file for further details).
 
-Official git repository: http://github.com/example42/puppet-redis
-
-Released under the terms of Apache 2 License.
-
-This module requires functions provided by the Example42 Puppi module.
-
-For detailed info about the logic and usage patterns of Example42 modules read README.usage on Example42 main modules set.
 
 ## USAGE - Basic management
 
-* Install redis with default settings
+* Install redis with default settings (package installed, service started, default configuration files)
 
-        class { "redis": }
+        class { 'redis': }
 
-* Disable redis service.
+* Set up an instance of Redis for one specific user:
 
-        class { "redis":
-          disable => true
+        class { 'redis':
+          disable_default => true,
         }
 
-* Disable redis service at boot time, but don't stop if is running.
-
-        class { "redis":
-          disableboot => true
+        redis::instance { $user:
+          user            => $user,
+          group           => $user,
+          socket_path     => "/var/run/redis/${user}-projectname.sock"
         }
 
-* Remove redis package
-
-        class { "redis":
-          absent => true
-        }
-
-* Enable auditing without without making changes on existing redis configuration files
-
-        class { "redis":
-          audit_only => true
-        }
-
-
-## USAGE - Overrides and Customizations
-* Use custom sources for main config file 
-
-        class { "redis":
-          source => [ "puppet:///modules/lab42/redis/redis.conf-${hostname}" , "puppet:///modules/lab42/redis/redis.conf" ], 
-        }
-
-
-* Use custom source directory for the whole configuration dir
-
-        class { "redis":
-          source_dir       => "puppet:///modules/lab42/redis/conf/",
-          source_dir_purge => false, # Set to true to purge any existing file not present in $source_dir
-        }
-
-* Use custom template for main config file 
-
-        class { "redis":
-          template => "example42/redis/redis.conf.erb",      
-        }
-
-* Define custom options that can be used in a custom template without the
-  need to add parameters to the redis class
-
-        class { "redis":
-          template => "example42/redis/redis.conf.erb",    
-          options  => {
-            'LogLevel' => 'INFO',
-            'UsePAM'   => 'yes',
-          },
-        }
-
-* Automaticallly include a custom subclass
-
-        class { "redis:"
-          my_class => 'redis::example42',
-        }
-
-
-## USAGE - Example42 extensions management 
-* Activate puppi (recommended, but disabled by default)
-  Note that this option requires the usage of Example42 puppi module
-
-        class { "redis": 
-          puppi    => true,
-        }
-
-* Activate puppi and use a custom puppi_helper template (to be provided separately with
-  a puppi::helper define ) to customize the output of puppi commands 
-
-        class { "redis":
-          puppi        => true,
-          puppi_helper => "myhelper", 
-        }
-
-* Activate automatic monitoring (recommended, but disabled by default)
-  This option requires the usage of Example42 monitor and relevant monitor tools modules
-
-        class { "redis":
-          monitor      => true,
-          monitor_tool => [ "nagios" , "monit" , "munin" ],
-        }
-
-* Activate automatic firewalling 
-  This option requires the usage of Example42 firewall and relevant firewall tools modules
-
-        class { "redis":       
-          firewall      => true,
-          firewall_tool => "iptables",
-          firewall_src  => "10.42.0.0/24",
-          firewall_dst  => "$ipaddress_eth0",
-        }
-
-
-[![Build Status](https://travis-ci.org/example42/puppet-redis.png?branch=master)](https://travis-ci.org/example42/puppet-redis)
+     By default this will add the specified user to the group $redis::group. This can only
+     be done if the specified user is defined using a virtual resource.
