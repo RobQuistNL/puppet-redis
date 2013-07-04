@@ -1,16 +1,16 @@
-class redismulti (
+class redis (
   $package         = params_lookup('package'),
   $user            = params_lookup('user'),
   $group           = params_lookup('group'),
   $disable_default = params_lookup('disable_default'),
-) inherits redismulti::params {
+) inherits redis::params {
   
   $bool_disable_default = any2bool($disable_default)
 
   package { $package: }
 
-  file { '/etc/init.d/redis-server':
-    content => template('redismulti/init.sh'),
+  file { '/etc/init.d/redis':
+    content => template('redis/init.sh'),
     mode    => 0551,
     owner   => root,
     group   => root,
@@ -22,16 +22,8 @@ class redismulti (
     group  => $group,
     mode   => 1771,
   }
-    
-  file { '/var/log/redis/redis-server.log':
-    ensure => file,
-    owner  => $user,
-    group  => $group,
-    mode   => 1771,
-  }
   
-  
-  file { '/usr/share/redis-server/':
+  file { '/usr/share/redis':
     ensure => directory,
     owner  => $user,
     group  => $group,
@@ -39,7 +31,7 @@ class redismulti (
   }
   
   
-  file { '/usr/share/redis-server/scripts/':
+  file { '/usr/share/redis/scripts':
     ensure => directory,
     owner  => $user,
     group  => $group,
@@ -54,8 +46,8 @@ class redismulti (
     system  => true,
   }
 
-  file { '/usr/share/redis-server/scripts/start-redis':
-    content => template('redismulti/startscript.sh'),
+  file { '/usr/share/redis/scripts/start-redis':
+    content => template('redis/startscript.sh'),
     mode    => 755,
   }
   

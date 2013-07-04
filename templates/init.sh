@@ -16,16 +16,16 @@
 ### END INIT INFO
 
 # Usage:
-# cp /etc/redis/redis.conf /etc/redis-server_server1.conf
-# cp /etc/redis/redis.conf /etc/redis-server_server2.conf
+# cp /etc/redis/redis.conf /etc/redis_server1.conf
+# cp /etc/redis/redis.conf /etc/redis_server2.conf
 # start all instances:
-# /etc/init.d/redis-server start
+# /etc/init.d/redis start
 # start one instance:
-# /etc/init.d/redis-server start server1
+# /etc/init.d/redis start server1
 # stop all instances:
-# /etc/init.d/redis-server stop
+# /etc/init.d/redis stop
 # stop one instance:
-# /etc/init.d/redis-server stop server1
+# /etc/init.d/redis stop server1
 # There is no "status" command.
 
 #
@@ -36,7 +36,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/redis-server
 DAEMONNAME=redis-server
 DAEMONBOOTSTRAP=/usr/share/redis-server/scripts/start-redis
-DESC=redis-server
+DESC=redis
 
 test -x $DAEMON || exit 0
 test -x $DAEMONBOOTSTRAP || exit 0
@@ -44,10 +44,6 @@ test -x $DAEMONBOOTSTRAP || exit 0
 set -e
 
 . /lib/lsb/init-functions
-
-# Edit /etc/default/redis-server to change this.
-ENABLE_REDIS=yes
-#test -r /etc/default/redis-server && . /etc/default/redis-server
 
 shopt -s extglob
 if [[ "${0##*/}" =~ "-" ]]; then
@@ -75,7 +71,7 @@ do
     then
       # add to config array
       CONFIGS+=($NAME)
-    elif [ "redis-server_$2" == "$NAME" ];
+    elif [ "redis_$2" == "$NAME" ];
     then
       # use only one redis
       CONFIGS=($NAME)
@@ -97,12 +93,10 @@ for ((i=0; i < $CONFIG_NUM; i++)); do
 case "$1" in
   start)
        echo -n "Starting $DESC: "
-       if [ $ENABLE_REDIS = yes ]; then
-            echo start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE /etc/redis/${NAME}.user.conf
-            start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE /etc/redis/${NAME}.user.conf
-       else
-            echo "$NAME disabled in /etc/default/redis-server."
-       fi
+
+       echo start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE /etc/${NAME}.user.conf
+       start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE /etc/${NAME}.user.conf
+
        ;;
   stop)
        echo -n "Stopping $DESC: "
@@ -120,12 +114,10 @@ case "$1" in
        echo -n "Restarting $DESC: "
        start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile $PIDFILE
        rm -f $PIDFILE
-       if [ $ENABLE_REDIS = yes ]; then
-       		start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE
-       		echo "$NAME."
-       else
-            echo "$NAME disabled in /etc/default/redis-server."
-       fi
+
+   	   start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE
+   	   echo "$NAME."
+
        ;;
   status)
        status_of_proc -p $PIDFILE $DAEMON $NAME  && exit 0 || exit $?

@@ -19,10 +19,10 @@ if($> != 0 and $< != 0)
 my $cmdPrefix; my $params; my $etchandle; my $etcfile = "/etc/redis/redis.conf"; my $userfile="";
 
 # This script assumes that redis-server is located at /usr/bin/redis-server, and
-# that the pidfile is writable at /var/run/redis/redis-server.pid
+# that the pidfile is writable at /var/run/redis/redis.pid
 
 my $redisserver = "/usr/bin/redis-server";
-my $pidfile = "/var/run/redis/redis-server.pid";
+my $pidfile = "/var/run/redis/redis.pid";
 
 if (scalar(@ARGV) == 3) {
     $etcfile = shift(@ARGV);

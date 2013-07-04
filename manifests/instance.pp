@@ -1,52 +1,52 @@
-define redismulti::instance (
+define redis::instance (
   $socket_path     = undef,
   $user            = 'root',
   $group           = 'root',
-  $template_config = 'redismulti/instance-config.conf',
+  $template_config = 'redis/instance-config.conf',
   $configure_user  = true,
 ) {
 
-  file { "/var/log/redis/redis-server-${name}.log":
+  file { "/var/log/redis/redis-${name}.log":
     ensure => file,
     owner  => $user,
     group  => $group,
     mode   => 755,
   }
 
-  $log_path = "/var/log/redis/redis-server-${name}.log"
+  $log_path = "/var/log/redis/redis-${name}.log"
   
   $bool_configure_user = true
   
-  include redismulti
+  include redis
 
-  file { "${redismulti::conf_prefix}${name}.conf":
+  file { "${redis::conf_prefix}${name}.conf":
     ensure   => file,
     content => template($template_config),
-    notify  => Service["redis-server-${name}"],
+    notify  => Service["redis-${name}"],
   }
 
-  file { "${redismulti::init_script}-${name}":
+  file { "${redis::init_script}-${name}":
     ensure   => link,
-    target   => $redismulti::init_script,
-    before   => Service ["redis-server-${name}"]
+    target   => $redis::init_script,
+    before   => Service ["redis-${name}"]
   }
   
-  file { "/etc/redis/redis-server-${user}.user.conf":
+  file { "/etc/redis-${user}.user.conf":
       ensure   => file, 
-      content => template('redismulti/userconfig.conf'),
+      content => template('redis/userconfig.conf'),
       mode    => 755,
-      before   => Service ["redis-server-${name}"]
+      before   => Service ["redis-${name}"]
     }
 
-  service { "redis-server-${name}":
+  service { "redis-${name}":
     hasstatus => true,
     ensure    => running,
   }
 
   if ($bool_configure_user == true) {
     # Make sure the user is member of the redis-multi group
-    User <| title == $user |> { groups +> $::redismulti::group }
+    User <| title == $user |> { groups +> $::redis::group }
     realize User[$user]
-    Group[$::redismulti::group] -> User[$user]
+    Group[$::redis::group] -> User[$user]
   }
 }

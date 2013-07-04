@@ -1,4 +1,4 @@
-# Puppet module: redis multi
+# Puppet module: Redis (with multi-user support)
 
 This is a Puppet module for redis.
 It manages its installation, configuration and service. It allows to run several instances

@@ -1,9 +1,9 @@
-class redismulti::params {
+class redis::params {
   
   $package = 'redis-server'
   
-  $conf_prefix     = '/etc/redis-server-'
-  $init_script     = '/etc/init.d/redis-server'
+  $conf_prefix     = '/etc/redis-'
+  $init_script     = '/etc/init.d/redis'
   
   $group           = 'redis'
   $user            = 'redis'
