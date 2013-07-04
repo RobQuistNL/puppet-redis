@@ -3,7 +3,6 @@ define redismulti::instance (
   $user            = 'root',
   $group           = 'root',
   $template_config = 'redismulti/instance-config.conf',
-  #$log_path        = undef,
   $configure_user  = true,
 ) {
 
@@ -15,7 +14,6 @@ define redismulti::instance (
   }
 
   $log_path = "/var/log/redis/redis-server-${name}.log"
-  #$socket_path = "/var/run/redis/redis-server-${name}.sock"
   
   $bool_configure_user = true
   
