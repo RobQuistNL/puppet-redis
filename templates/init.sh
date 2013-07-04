@@ -52,7 +52,6 @@ else
   FILES=(/etc/${0##*/}?(-*).conf)
 fi
 
-FILES=(/etc/${0##*/}?(-*).conf)
 # check for alternative config schema
 CONFIGS=()
 for FILE in ${FILES[@]}
