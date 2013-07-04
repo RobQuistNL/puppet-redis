@@ -10,12 +10,12 @@ define redis::instance (
     ensure => file,
     owner  => $user,
     group  => $group,
-    mode   => 755,
+    mode   => 0755,
   }
 
   $log_path = "/var/log/redis/redis-${name}.log"
   
-  $bool_configure_user = true
+  $bool_configure_user = any2bool($configure_user)
   
   include redis
 
@@ -31,10 +31,10 @@ define redis::instance (
     before   => Service ["redis-${name}"]
   }
   
-  file { "/etc/redis-${user}.user.conf":
+  file { "/etc/default/redis/redis-${user}":
       ensure   => file, 
       content => template('redis/userconfig.conf'),
-      mode    => 755,
+      mode    => 0644,
       before   => Service ["redis-${name}"]
     }
 

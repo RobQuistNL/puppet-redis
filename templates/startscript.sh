@@ -16,7 +16,7 @@ if($> != 0 and $< != 0)
     exit;
 }
 
-my $cmdPrefix; my $params; my $etchandle; my $etcfile = "/etc/redis/redis.conf"; my $userfile="";
+my $cmdPrefix; my $params; my $etchandle; my $etcfile = "/etc/redis/redis.conf"; my $username="";
 
 # This script assumes that redis-server is located at /usr/bin/redis-server, and
 # that the pidfile is writable at /var/run/redis/redis.pid
@@ -27,7 +27,7 @@ my $pidfile = "/var/run/redis/redis.pid";
 if (scalar(@ARGV) == 3) {
     $etcfile = shift(@ARGV);
     $pidfile = shift(@ARGV);
-    $userfile = shift(@ARGV);
+    $username = shift(@ARGV);
 }
 
 # If we don't get a valid logfile parameter in the /etc/redis-server.conf file,
@@ -58,11 +58,7 @@ my $conf_directives = {
     "logfile" => \&handle_logfile,
 };
 
-open USERHANDLE, "$userfile";
-$cmdPrefix = <USERHANDLE>;
-close USERHANDLE;
-
-$cmdPrefix = "sudo -u $cmdPrefix";
+$cmdPrefix = "sudo -u $username";
 
 push @$params, "-u root" unless(grep "-u", @$params);
 $params = join " ", @$params;

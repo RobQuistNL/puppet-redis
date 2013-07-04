@@ -35,7 +35,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/redis-server
 DAEMONNAME=redis-server
-DAEMONBOOTSTRAP=/usr/share/redis-server/scripts/start-redis
+DAEMONBOOTSTRAP=/usr/share/redis/scripts/start-redis
 DESC=redis
 
 test -x $DAEMON || exit 0
@@ -89,13 +89,21 @@ CONFIG_NUM=${#CONFIGS[@]}
 for ((i=0; i < $CONFIG_NUM; i++)); do
   NAME=${CONFIGS[${i}]}
   PIDFILE="/var/run/redis/${NAME}.pid"
-
+  
+  ENABLE_REDIS=no
+  REDIS_USER=root
+  test -r /etc/default/redis/${NAME} && . /etc/default/redis/${NAME}
+  
 case "$1" in
   start)
+	   if [ $ENABLE_REDIS != yes ]; then
+            echo "$NAME disabled in /etc/default/redis/${NAME}."
+            exit;
+       fi
        echo -n "Starting $DESC: "
 
-       echo start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE /etc/${NAME}.user.conf
-       start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE /etc/${NAME}.user.conf
+       echo start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE $REDIS_USER
+       start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE $REDIS_USER
 
        ;;
   stop)
@@ -114,9 +122,13 @@ case "$1" in
        echo -n "Restarting $DESC: "
        start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile $PIDFILE
        rm -f $PIDFILE
-
-   	   start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE
-   	   echo "$NAME."
+	   
+	   if [ $ENABLE_REDIS != yes ]; then
+            echo "$NAME disabled in /etc/default/redis/${NAME}."
+            exit;
+       fi	
+   	   echo start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE $REDIS_USER
+       start-stop-daemon --start --exec "$DAEMONBOOTSTRAP" /etc/${NAME}.conf $PIDFILE $REDIS_USER
 
        ;;
   status)

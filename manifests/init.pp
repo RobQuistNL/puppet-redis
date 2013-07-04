@@ -23,11 +23,18 @@ class redis (
     mode   => 1771,
   }
   
+  file { '/etc/default/redis':
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => 0655,
+  }
+  
   file { '/usr/share/redis':
     ensure => directory,
     owner  => $user,
     group  => $group,
-    mode   => 1771,
+    mode   => 0755,
   }
   
   
@@ -35,7 +42,7 @@ class redis (
     ensure => directory,
     owner  => $user,
     group  => $group,
-    mode   => 1771,
+    mode   => 0755,
   }
   
   group { $group:
