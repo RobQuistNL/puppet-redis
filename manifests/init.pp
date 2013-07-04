@@ -38,11 +38,11 @@ class redis (
     mode   => 1771,
   }
   
-  group { 'redis':
+  group { $group:
     system => true,
   }
 
-  user { 'redis':
+  user { $user:
     system  => true,
   }
 
